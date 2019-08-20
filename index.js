@@ -37,6 +37,7 @@ class CountDown extends React.Component {
     onChange: PropTypes.func,
     onPress: PropTypes.func,
     onFinish: PropTypes.func,
+    isSeparated: PropTypes.bool
   };
 
   state = {
@@ -128,7 +129,7 @@ class CountDown extends React.Component {
       <View style={[
         styles.digitCont,
         digitStyle,
-        {width: size * 2.3, height: size * 2.6},
+        // {width: size * 2.3, height: size * 2.6},
       ]}>
         <Text style={[
           styles.digitTxt,
@@ -167,10 +168,23 @@ class CountDown extends React.Component {
     );
   };
 
+  renderSingleDigits = (label, digits) => {
+    return (
+      <View style={styles.singleDigitCont}>
+        <View style={styles.timeInnerCont}>
+          {this.renderDigit(digits[0])}
+          {this.renderDigit(digits[1])}
+          {digits[2] && this.renderDigit(digits[2])}
+        </View>
+        {this.renderLabel(label)}
+      </View>
+    );
+  };
+
   renderSeparator = () => {
     const {separatorStyle, size} = this.props;
     return (
-      <View style={{justifyContent: 'center', alignItems: 'center'}}>
+      <View>
         <Text style={[
           styles.separatorTxt,
           {fontSize: size * 1.2},
@@ -188,19 +202,18 @@ class CountDown extends React.Component {
     const {days, hours, minutes, seconds} = this.getTimeLeft();
     const newTime = sprintf('%02d:%02d:%02d:%02d', days, hours, minutes, seconds).split(':');
     const Component = this.props.onPress ? TouchableOpacity : View;
-
     return (
       <Component
         style={styles.timeCont}
         onPress={this.props.onPress}
-      >
-        {timeToShow.includes('D') ? this.renderDoubleDigits(timeLabels.d, newTime[0]) : null}
+      > 
+        {timeToShow.includes('D') && !this.props.isSeparated ? this.renderDoubleDigits(timeLabels.d, newTime[0]) : (timeToShow.includes('D') && this.props.isSeparated ? this.renderSingleDigits(timeLabels.d, newTime[0]) : null)}
         {showSeparator && timeToShow.includes('D') && timeToShow.includes('H') ? this.renderSeparator() : null}
-        {timeToShow.includes('H') ? this.renderDoubleDigits(timeLabels.h, newTime[1]) : null}
+        {timeToShow.includes('H') && !this.props.isSeparated ? this.renderDoubleDigits(timeLabels.h, newTime[1]) : (timeToShow.includes('H') && this.props.isSeparated ? this.renderSingleDigits(timeLabels.h, newTime[1]) : null)}
         {showSeparator && timeToShow.includes('H') && timeToShow.includes('M') ? this.renderSeparator() : null}
-        {timeToShow.includes('M') ? this.renderDoubleDigits(timeLabels.m, newTime[2]) : null}
+        {timeToShow.includes('M') && !this.props.isSeparated ? this.renderDoubleDigits(timeLabels.m, newTime[2]) : (timeToShow.includes('M') && this.props.isSeparated ? this.renderSingleDigits(timeLabels.m, newTime[2]) : null)}
         {showSeparator && timeToShow.includes('M') && timeToShow.includes('S') ? this.renderSeparator() : null}
-        {timeToShow.includes('S') ? this.renderDoubleDigits(timeLabels.s, newTime[3]) : null}
+        {timeToShow.includes('S') && !this.props.isSeparated ? this.renderDoubleDigits(timeLabels.s, newTime[3]) : (timeToShow.includes('S') && this.props.isSeparated ? this.renderSingleDigits(timeLabels.s, newTime[3]) : null)}
       </Component>
     );
   };
@@ -225,12 +238,12 @@ CountDown.defaultProps = {
   until: 0,
   size: 15,
   running: true,
+  isSeparated: false
 };
 
 const styles = StyleSheet.create({
   timeCont: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: 'row'
   },
   timeTxt: {
     color: 'white',
@@ -252,14 +265,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  singleDigitCont: {
+    // justifyContent: 'center',
+    // alignItems: 'center'
+  },
   digitTxt: {
     color: 'white',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     fontVariant: ['tabular-nums']
   },
   separatorTxt: {
-    backgroundColor: 'transparent',
-    fontWeight: 'bold',
+    alignSelf: 'center',
+    fontWeight: 'bold'
   },
 });
 
